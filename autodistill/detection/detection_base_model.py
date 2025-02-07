@@ -4,7 +4,7 @@ import os
 from abc import abstractmethod
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict, List, Callable
 
 import cv2
 import numpy as np
@@ -80,6 +80,7 @@ class DetectionBaseModel(BaseModel):
         os.makedirs(output_folder, exist_ok=True)
 
         image_paths = glob.glob(input_folder + "/*" + extension)
+
         detections_map = {}
 
         if sahi:
@@ -114,9 +115,10 @@ class DetectionBaseModel(BaseModel):
         )
 
         if record_confidence:
+            detections_map_names_as_keys = {os.path.basename(f_path): detections for f_path, detections in detections_map.items()}
             image_names = [os.path.basename(f_path) for f_path in image_paths]
             self._record_confidence_in_files(
-                output_folder + "/annotations", image_names, detections_map
+                output_folder + "/annotations", image_names, detections_map_names_as_keys
             )
         split_data(output_folder, record_confidence=record_confidence)
 
